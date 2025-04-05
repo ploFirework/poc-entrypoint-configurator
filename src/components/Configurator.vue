@@ -17,12 +17,14 @@
           height: !parentConfig.isResponsive ? `${parentConfig.height}px` : undefined
         }"
       >
-        <template v-if="parentConfig.showThumbnail">
-          <div class="thumbnail">
-            <img src="@/assets/avatar.svg" alt="Thumbnail" />
-          </div>
-        </template>
-        <h3 v-if="parentConfig.title" class="title">{{ parentConfig.title }}</h3>
+        <div class="header-container" style="display: flex; align-items: center; gap: 1rem;">
+          <template v-if="parentConfig.showThumbnail">
+            <div class="thumbnail">
+              <img src="@/assets/avatar.svg" alt="Thumbnail" />
+            </div>
+          </template>
+          <h3 v-if="parentConfig.title" class="title">{{ parentConfig.title }}</h3>
+        </div>
         
         <div class="modules-container">
           <template v-for="module in enabledModules" :key="module.id">
@@ -81,15 +83,27 @@
 
           <div class="form-group">
             <label>Primary Color</label>
-            <input type="color" v-model="parentConfig.primaryColor">
+            <div class="color-with-text">
+              <div class="color-swatch">
+                <input 
+                  type="color" 
+                  v-model="parentConfig.primaryColor"
+                >
+              </div>
+              <input 
+                type="text" 
+                v-model="parentConfig.primaryColor"
+                class="color-text"
+              >
+            </div>
           </div>
 
           <div class="form-group">
             <label>Border</label>
             <div class="border-controls">
-              <div class="color-with-button">
+              <div class="color-with-text">
                 <div 
-                  class="color-input-wrapper"
+                  class="color-swatch"
                   :class="{ 'checker-pattern': parentConfig.borderColor === 'none' }"
                 >
                   <input 
@@ -99,13 +113,20 @@
                     :class="{ 'transparent': parentConfig.borderColor === 'none' }"
                   >
                 </div>
-                <button 
-                  class="secondary-button"
-                  @click="toggleBorderColor"
+                <input 
+                  type="text" 
+                  v-model="parentConfig.borderColor"
+                  :disabled="parentConfig.borderColor === 'none'"
+                  :class="{ 'transparent': parentConfig.borderColor === 'none' }"
+                  class="color-text"
                 >
-                  {{ parentConfig.borderColor === 'none' ? 'Set Color' : 'None' }}
-                </button>
               </div>
+              <button 
+                class="secondary-button"
+                @click="toggleBorderColor"
+              >
+                {{ parentConfig.borderColor === 'none' ? 'Set Color' : 'None' }}
+              </button>
               <input 
                 type="number" 
                 v-model.number="parentConfig.borderWidth"
@@ -155,43 +176,19 @@
         </div>
       </div>
 
-      <div class="settings-section">
-        <h2>Modules</h2>
-        <div class="modules-settings">
-          <div 
-            v-for="(module, index) in modules" 
-            :key="module.id"
-            class="module-settings"
-          >
-            <div class="module-header">
-              <label class="checkbox-label">
-                <input 
-                  type="checkbox" 
-                  v-model="module.enabled"
-                > {{ getModuleLabel(module.type) }}
-              </label>
-              <div class="module-controls">
-                <button 
-                  class="icon-button"
-                  @click="moveModule(index, -1)"
-                  :disabled="!module.enabled || displayOrder.indexOf(index) === 0"
-                >↑</button>
-                <button 
-                  class="icon-button"
-                  @click="moveModule(index, 1)"
-                  :disabled="!module.enabled || displayOrder.indexOf(index) === modules.length - 1"
-                >↓</button>
-              </div>
-            </div>
+      <div class="settings-section" v-if="modules[0].enabled">
+        <h2>Simple Button Settings</h2>
+        <SimpleButtonConfig v-model="modules[0].config" />
+      </div>
 
-            <div v-if="module.enabled" class="module-config">
-              <component 
-                :is="`${module.type}Config`"
-                v-model="module.config"
-              />
-            </div>
-          </div>
-        </div>
+      <div class="settings-section" v-if="modules[1].enabled">
+        <h2>Question List Settings</h2>
+        <ButtonListConfig v-model="modules[1].config" />
+      </div>
+
+      <div class="settings-section" v-if="modules[2].enabled">
+        <h2>Question Field Settings</h2>
+        <TextFieldConfig v-model="modules[2].config" />
       </div>
     </div>
   </div>
@@ -224,11 +221,11 @@ export default {
       width: 400,
       height: 600,
       showThumbnail: true,
-      title: '',
-      primaryColor: '#007AFF',
+      title: 'Have questions about this product?',
+      primaryColor: '#006AFF',
       borderColor: '#E5E7EB',
       borderWidth: 1,
-      borderRadius: 8,
+      borderRadius: 12,
       backgroundColor: '#FFFFFF',
       mode: 'block'
     })
@@ -275,8 +272,8 @@ export default {
     const getModuleLabel = (type) => {
       const labels = {
         SimpleButton: 'Simple Button',
-        ButtonList: 'Button List',
-        TextField: 'Text Field'
+        ButtonList: 'Question List',
+        TextField: 'Question Field'
       }
       return labels[type] || type
     }
@@ -327,7 +324,8 @@ export default {
 
 <style scoped>
 .configurator {
-  display: flex;
+  display: grid;
+  grid-template-rows: 1fr 1fr;
   gap: 2rem;
   padding: 2rem;
   height: 100vh;
@@ -335,7 +333,6 @@ export default {
 }
 
 .configurator__preview {
-  flex: 1;
   background: linear-gradient(to bottom, #E5E7EB, #FFFFFF);
   border-radius: 8px;
   padding: 2rem;
@@ -345,38 +342,20 @@ export default {
   align-items: flex-start;
 }
 
-.preview-container {
-  min-width: 300px;
-  min-height: 200px;
-  padding: 1.5rem;
-  background: #fff;
-  border: 1px solid #E5E7EB;
-  border-radius: 8px;
-}
-
-.preview-container--responsive {
-  width: 100%;
-}
-
-.preview-container--drawer {
-  position: relative;
-  margin-left: auto;
-  height: 100%;
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
 .configurator__settings {
-  width: 400px;
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 1rem;
+  height: 100%;
+}
+
+.settings-section {
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
-}
-
-.settings-section {
-  margin-bottom: 2rem;
+  max-height: 100%;
 }
 
 .settings-section h2 {
@@ -453,53 +432,40 @@ input[type="color"] {
 }
 
 .modules-settings {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  display: none;
 }
 
 .module-settings {
-  padding: 1rem;
-  background: #F9FAFB;
-  border: 1px solid #E5E7EB;
-  border-radius: 4px;
+  height: 100%;
 }
 
-.module-header {
+.preview-container {
+  max-height: 100%;
+  overflow-y: auto;
+  min-width: 300px;
+  min-height: 200px;
+  padding: 1.5rem;
+  background: #fff;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+}
+
+.preview-container--responsive {
+  width: 100%;
+}
+
+.preview-container--drawer {
+  position: relative;
+  margin-left: auto;
+  height: 100%;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.header-container {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-}
-
-.module-controls {
-  display: flex;
-  gap: 0.25rem;
-}
-
-.icon-button {
-  padding: 0.25rem 0.5rem;
-  background: white;
-  border: 1px solid #E5E7EB;
-  border-radius: 4px;
-  font-size: 0.875rem;
-  color: #374151;
-  cursor: pointer;
-}
-
-.icon-button:hover:not(:disabled) {
-  background: #F3F4F6;
-}
-
-.icon-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.module-config {
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid #E5E7EB;
+  gap: 1rem;
 }
 
 .thumbnail {
@@ -577,5 +543,44 @@ input[type="color"] {
   background-size: 16px 16px;
   background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
   background-color: white;
+}
+
+.color-with-text {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.color-swatch {
+  width: 38px;
+  height: 38px;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.color-swatch input[type="color"] {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.color-text {
+  flex: 1;
+  font-family: monospace;
+  text-transform: uppercase;
+  width: 100px;
+}
+
+.color-swatch.transparent {
+  opacity: 0.5;
+}
+
+.color-text.transparent {
+  opacity: 0.5;
+  background-color: #F3F4F6;
 }
 </style>

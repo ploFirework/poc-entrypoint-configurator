@@ -1,13 +1,15 @@
 <template>
-  <div class="text-field">
+  <div 
+    class="text-field"
+    :style="{
+      borderRadius: `${borderRadius}px`
+    }"
+  >
     <input 
       type="text"
       :placeholder="placeholder"
       v-model="inputValue"
       @keyup.enter="handleSubmit"
-      :style="{
-        borderRadius: `${borderRadius}px`
-      }"
     >
     <button 
       class="submit-button"
@@ -17,7 +19,10 @@
         borderRadius: `${borderRadius}px`
       }"
     >
-      ↑
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 3.33333L8 12.6667" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        <path d="M3.33331 8L7.99998 3.33333L12.6666 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </button>
   </div>
 </template>
@@ -66,30 +71,39 @@ export default {
 .text-field {
   position: relative;
   display: flex;
-  gap: 0.5rem;
+  border: 1px solid #E5E7EB;
+  transition: border-color 0.2s;
+}
+
+.text-field:focus-within {
+  border-color: #9CA3AF;
 }
 
 input {
   flex: 1;
   padding: 0.75rem 1rem;
-  border: 1px solid #E5E7EB;
+  padding-right: calc(0.75rem * 2 + 38px); /* Make room for the button */
+  border: none;
   font-size: 0.875rem;
-  transition: border-color 0.2s;
+  background: transparent;
 }
 
 input:focus {
   outline: none;
-  border-color: #9CA3AF;
 }
 
 .submit-button {
+  position: absolute;
+  right: 4px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
+  aspect-ratio: 1;
+  height: calc(100% - 8px);
   border: none;
   color: white;
-  font-size: 1.25rem;
   cursor: pointer;
   transition: opacity 0.2s;
 }

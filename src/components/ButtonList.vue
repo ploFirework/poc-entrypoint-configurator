@@ -81,12 +81,41 @@ export default {
 <style scoped>
 .button-list {
   display: flex;
-  flex-wrap: wrap;
   gap: 0.5rem;
+  position: relative;
 }
 
 .button-list--vertical {
   flex-direction: column;
+  flex-wrap: wrap;
+}
+
+/* Only apply these styles when not in vertical mode */
+.button-list:not(.button-list--vertical) {
+  width: 100%;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, 
+    black 80%, 
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(to right, 
+    black 80%, 
+    transparent 100%
+  );
+}
+
+.button-list:not(.button-list--vertical) .list-button {
+  flex: 0 0 40%;
+}
+
+.button-list:not(.button-list--vertical) .list-button:nth-child(3) {
+  flex: 0 0 20%;
+}
+
+.button-list:not(.button-list--vertical) .list-button:nth-child(n+4) {
+  flex: 0 0 40%;
+  visibility: hidden;
+  position: absolute;
 }
 
 .list-button {
@@ -101,6 +130,7 @@ export default {
   cursor: pointer;
   transition: opacity 0.2s;
   white-space: nowrap;
+  min-width: 0; /* Allow truncation */
 }
 
 .list-button:hover {
@@ -113,6 +143,10 @@ export default {
 
 .button-text {
   order: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .ai-icon {
@@ -120,6 +154,7 @@ export default {
   align-items: center;
   justify-content: center;
   order: 1;
+  flex-shrink: 0;
 }
 
 .ai-icon svg {
