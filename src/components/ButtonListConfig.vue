@@ -1,7 +1,7 @@
 <template>
   <div class="button-list-config">
     <div class="form-group">
-      <label>Button List (one per line)</label>
+      <label>Questions (one per line)</label>
       <textarea
         v-model="buttonsText"
         @input="updateConfig"

@@ -40,7 +40,7 @@
     </div>
 
     <div class="configurator__settings">
-      <div class="settings-section">
+      <div class="settings-section" style="grid-row: 1 / -1;">
         <h2>Parent Container Settings</h2>
         <div class="settings-group">
           <label class="checkbox-label">
@@ -145,9 +145,9 @@
 
           <div class="form-group">
             <label>Background Color</label>
-            <div class="color-with-button">
+            <div class="color-with-text">
               <div 
-                class="color-input-wrapper"
+                class="color-swatch"
                 :class="{ 'checker-pattern': parentConfig.backgroundColor === 'transparent' }"
               >
                 <input 
@@ -157,6 +157,13 @@
                   :class="{ 'transparent': parentConfig.backgroundColor === 'transparent' }"
                 >
               </div>
+              <input 
+                type="text" 
+                v-model="parentConfig.backgroundColor"
+                :disabled="parentConfig.backgroundColor === 'transparent'"
+                :class="{ 'transparent': parentConfig.backgroundColor === 'transparent' }"
+                class="color-text"
+              >
               <button 
                 class="secondary-button"
                 @click="toggleBackgroundColor"
@@ -176,19 +183,94 @@
         </div>
       </div>
 
-      <div class="settings-section" v-if="modules[0].enabled">
-        <h2>Simple Button Settings</h2>
-        <SimpleButtonConfig v-model="modules[0].config" />
+      <div class="settings-section">
+        <div class="module-header">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              v-model="modules[0].enabled"
+            >
+            <span class="toggle-text">Simple Button</span>
+          </label>
+          <div class="module-controls">
+            <button 
+              class="icon-button"
+              @click="moveModule(0, -1)"
+              :disabled="!modules[0].enabled || displayOrder.indexOf(0) === 0"
+            >↑</button>
+            <button 
+              class="icon-button"
+              @click="moveModule(0, 1)"
+              :disabled="!modules[0].enabled || displayOrder.indexOf(0) === modules.length - 1"
+            >↓</button>
+          </div>
+        </div>
+        <div 
+          class="module-config"
+          :class="{ 'module-config--disabled': !modules[0].enabled }"
+        >
+          <SimpleButtonConfig v-model="modules[0].config" />
+        </div>
       </div>
 
-      <div class="settings-section" v-if="modules[1].enabled">
-        <h2>Question List Settings</h2>
-        <ButtonListConfig v-model="modules[1].config" />
+      <div class="settings-section">
+        <div class="module-header">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              v-model="modules[1].enabled"
+            >
+            <span class="toggle-text">Question List</span>
+          </label>
+          <div class="module-controls">
+            <button 
+              class="icon-button"
+              @click="moveModule(1, -1)"
+              :disabled="!modules[1].enabled || displayOrder.indexOf(1) === 0"
+            >↑</button>
+            <button 
+              class="icon-button"
+              @click="moveModule(1, 1)"
+              :disabled="!modules[1].enabled || displayOrder.indexOf(1) === modules.length - 1"
+            >↓</button>
+          </div>
+        </div>
+        <div 
+          class="module-config"
+          :class="{ 'module-config--disabled': !modules[1].enabled }"
+        >
+          <ButtonListConfig v-model="modules[1].config" />
+        </div>
       </div>
 
-      <div class="settings-section" v-if="modules[2].enabled">
-        <h2>Question Field Settings</h2>
-        <TextFieldConfig v-model="modules[2].config" />
+      <div class="settings-section">
+        <div class="module-header">
+          <label class="toggle-label">
+            <input 
+              type="checkbox" 
+              v-model="modules[2].enabled"
+            >
+            <span class="toggle-text">Question Field</span>
+          </label>
+          <div class="module-controls">
+            <button 
+              class="icon-button"
+              @click="moveModule(2, -1)"
+              :disabled="!modules[2].enabled || displayOrder.indexOf(2) === 0"
+            >↑</button>
+            <button 
+              class="icon-button"
+              @click="moveModule(2, 1)"
+              :disabled="!modules[2].enabled || displayOrder.indexOf(2) === modules.length - 1"
+            >↓</button>
+          </div>
+        </div>
+        <div 
+          class="module-config"
+          :class="{ 'module-config--disabled': !modules[2].enabled }"
+        >
+          <TextFieldConfig v-model="modules[2].config" />
+        </div>
       </div>
     </div>
   </div>
@@ -219,7 +301,7 @@ export default {
     const parentConfig = reactive({
       isResponsive: true,
       width: 400,
-      height: 600,
+      height: 400,
       showThumbnail: true,
       title: 'Have questions about this product?',
       primaryColor: '#006AFF',
@@ -330,6 +412,7 @@ export default {
   padding: 2rem;
   height: 100vh;
   background: #F3F4F6;
+  overflow: hidden;
 }
 
 .configurator__preview {
@@ -344,7 +427,7 @@ export default {
 
 .configurator__settings {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
+  grid-template: auto auto auto / 2fr 2fr;
   gap: 1rem;
   height: 100%;
 }
@@ -535,16 +618,6 @@ input[type="color"] {
   opacity: 0;
 }
 
-.checker-pattern {
-  background-image: linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
-    linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
-    linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
-    linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
-  background-size: 16px 16px;
-  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
-  background-color: white;
-}
-
 .color-with-text {
   display: flex;
   gap: 0.5rem;
@@ -558,6 +631,7 @@ input[type="color"] {
   border-radius: 4px;
   overflow: hidden;
   flex-shrink: 0;
+  position: relative;
 }
 
 .color-swatch input[type="color"] {
@@ -566,6 +640,14 @@ input[type="color"] {
   padding: 0;
   border: none;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.color-swatch input[type="color"].transparent {
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
 }
 
 .color-text {
@@ -575,12 +657,86 @@ input[type="color"] {
   width: 100px;
 }
 
-.color-swatch.transparent {
-  opacity: 0.5;
-}
-
 .color-text.transparent {
   opacity: 0.5;
   background-color: #F3F4F6;
+}
+
+.checker-pattern {
+  background-image: linear-gradient(45deg, #E5E7EB 25%, transparent 25%),
+    linear-gradient(-45deg, #E5E7EB 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #E5E7EB 75%),
+    linear-gradient(-45deg, transparent 75%, #E5E7EB 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+  background-color: white;
+}
+
+.module-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.toggle-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  cursor: pointer;
+  accent-color: #006AFF;
+}
+
+.toggle-text {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #111827;
+  user-select: none;
+}
+
+.module-controls {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.icon-button {
+  padding: 0.25rem 0.5rem;
+  background: white;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.icon-button:hover:not(:disabled) {
+  background: #F3F4F6;
+  border-color: #D1D5DB;
+}
+
+.icon-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.module-config {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #E5E7EB;
+  transition: opacity 0.2s, filter 0.2s;
+}
+
+.module-config--disabled {
+  opacity: 0.5;
+  filter: grayscale(100%);
+  pointer-events: none;
 }
 </style>
