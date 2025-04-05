@@ -1,0 +1,35 @@
+This is an app for configuring a dynamic html block.  This block is a parent container that contains other modules.  The parent container is configurable and the modules are configurable.  The main view should show a preview of the block on top and the all the settings of both the parent and modules below.  The preview is not interactive.
+
+The following attributes on the parent container are configurable:
+- a checkbox to make parent block responsive or fixed height and width, with text fields to enter height and width
+- a checkbox to show/hide thumbnail - which shows or hides a small image of a person
+- title - an open text field
+- primary-color - a color picker
+- border-color - a color picker or a button to set none
+- border-width - a number field
+- border-radius - a number field
+- background-color - a color picker or set-as-transparent button
+- toggle to select between "block" and "drawer" mode where block is a static block and drawer is a drawer that slides in from the right
+
+The modules are the following with the following attributes:  
+- simple button
+  - a checkbox to toggle if module is enabled or disabled
+  - up/down arrows to move the module up and down the list of modules
+  - open text field for button text
+  - checkbox to show/hide "ai icon"
+  - this module also uses the parent container's border-radius, and primary-color
+  
+- a list of buttons
+  - a checkbox to toggle if module is enabled or disabled
+  - up/down arrows to move the module up and down the list of modules
+  - a textarea to enter list of button text
+  - a mode toggle to select between "horizontal" and "vertical"
+  - checkbox to show/hide "ai icon" on each button
+  - checkbox to show/hide fixed "simple button" at end with fixed text "Ask another question"
+  - this module also uses the parent container's border-radius, and primary-color
+  
+- an open text field with a submit button which is an up arrow
+  - a checkbox to toggle if module is enabled or disabled
+  - up/down arrows to move the module up and down the list of modules
+  - a field to enter placeholder text, default is "Ask a question"
+  - this module also uses the parent container's border-radius, and primary-color in the submit button
