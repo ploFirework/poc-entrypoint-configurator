@@ -50,218 +50,216 @@
     </div>
 
     <div class="configurator__settings">
-      <div class="settings-section" style="grid-row: 1 / -1;">
-        <div class="settings-header">
-          <h2>Ava Entry Point</h2>
+      <div class="settings-header" style="grid-column: 1 / -1;">
+        <h2>Ava Entry Point</h2>
+        <div class="settings-mode-selector">
+          <label class="mode-option">
+            <input 
+              type="radio" 
+              v-model="isAdvancedMode" 
+              :value="false"
+            >
+            <span class="mode-label">Easy</span>
+          </label>
+          <label class="mode-option">
+            <input 
+              type="radio" 
+              v-model="isAdvancedMode" 
+              :value="true"
+            >
+            <span class="mode-label">Advanced</span>
+          </label>
+        </div>
+      </div>
+
+      <div v-if="!isAdvancedMode" class="easy-mode">
+        <button 
+          class="preset-button"
+          @click="applyPreset('simpleButton')"
+        >
+          Simple Button
+        </button>
+        <button 
+          class="preset-button"
+          @click="applyPreset('faq')"
+        >
+          FAQ
+        </button>
+        <button 
+          class="preset-button"
+          @click="applyPreset('drawer')"
+        >
+          Drawer
+        </button>
+      </div>
+
+      <div v-show="isAdvancedMode" class="settings-group"  style="grid-row: 2 / -1;">
+        <div class="container-size-controls">
+          <label class="checkbox-label" style="margin-top:20px;">
+            <input 
+              type="checkbox" 
+              v-model="parentConfig.isFixedSize"
+            > Set Fixed Size
+          </label>
+
+          <div class="form-group">
+            <label>Width (px)</label>
+            <input 
+              type="number" 
+              v-model.number="parentConfig.width"
+              min="0"
+              :disabled="!parentConfig.isFixedSize"
+            >
+          </div>
+          <div class="form-group">
+            <label>Height (px)</label>
+            <input 
+              type="number" 
+              v-model.number="parentConfig.height"
+              min="0"
+              :disabled="!parentConfig.isFixedSize"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Mode</label>
           <div class="mode-selector">
             <label class="mode-option">
               <input 
                 type="radio" 
-                v-model="isAdvancedMode" 
-                :value="false"
+                v-model="parentConfig.mode" 
+                value="block"
               >
-              <span class="mode-label">Easy</span>
+              <span class="mode-label">Block</span>
             </label>
             <label class="mode-option">
               <input 
                 type="radio" 
-                v-model="isAdvancedMode" 
-                :value="true"
+                v-model="parentConfig.mode" 
+                value="drawer"
               >
-              <span class="mode-label">Advanced</span>
+              <span class="mode-label">Drawer</span>
             </label>
           </div>
         </div>
-
-        <div v-if="!isAdvancedMode" class="easy-mode">
-          <button 
-            class="preset-button"
-            @click="applyPreset('simpleButton')"
-          >
-            Simple Button
-          </button>
-          <button 
-            class="preset-button"
-            @click="applyPreset('faq')"
-          >
-            FAQ
-          </button>
-          <button 
-            class="preset-button"
-            @click="applyPreset('drawer')"
-          >
-            Drawer
-          </button>
+        
+        <label class="checkbox-label">
+          <input 
+            type="checkbox" 
+            v-model="parentConfig.showThumbnail"
+          > Show Thumbnail
+        </label>
+        
+        <div class="form-group">
+          <label>Title</label>
+          <input type="text" v-model="parentConfig.title">
         </div>
 
-        <div v-show="isAdvancedMode" class="settings-group">
-          <div class="container-size-controls">
-            <label class="checkbox-label" style="margin-top:20px;">
+        <div class="form-group">
+          <label>Primary Color</label>
+          <div class="color-with-text">
+            <div class="color-swatch">
               <input 
-                type="checkbox" 
-                v-model="parentConfig.isFixedSize"
-              > Set Fixed Size
-            </label>
-
-            <div class="form-group">
-              <label>Width (px)</label>
-              <input 
-                type="number" 
-                v-model.number="parentConfig.width"
-                min="0"
-                :disabled="!parentConfig.isFixedSize"
-              >
-            </div>
-            <div class="form-group">
-              <label>Height (px)</label>
-              <input 
-                type="number" 
-                v-model.number="parentConfig.height"
-                min="0"
-                :disabled="!parentConfig.isFixedSize"
-              >
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Mode</label>
-            <div class="mode-selector">
-              <label class="mode-option">
-                <input 
-                  type="radio" 
-                  v-model="parentConfig.mode" 
-                  value="block"
-                >
-                <span class="mode-label">Block</span>
-              </label>
-              <label class="mode-option">
-                <input 
-                  type="radio" 
-                  v-model="parentConfig.mode" 
-                  value="drawer"
-                >
-                <span class="mode-label">Drawer</span>
-              </label>
-            </div>
-          </div>
-          
-          <label class="checkbox-label">
-            <input 
-              type="checkbox" 
-              v-model="parentConfig.showThumbnail"
-            > Show Thumbnail
-          </label>
-          
-          <div class="form-group">
-            <label>Title</label>
-            <input type="text" v-model="parentConfig.title">
-          </div>
-
-          <div class="form-group">
-            <label>Primary Color</label>
-            <div class="color-with-text">
-              <div class="color-swatch">
-                <input 
-                  type="color" 
-                  v-model="parentConfig.primaryColor"
-                >
-              </div>
-              <input 
-                type="text" 
+                type="color" 
                 v-model="parentConfig.primaryColor"
-                class="color-text"
               >
             </div>
+            <input 
+              type="text" 
+              v-model="parentConfig.primaryColor"
+              class="color-text"
+            >
           </div>
+        </div>
 
-          <div class="form-group">
-            <label>Border</label>
-            <div class="border-controls">
-              <div class="color-with-text">
-                <div 
-                  class="color-swatch"
-                  :class="{ 'checker-pattern': parentConfig.borderColor === 'none' }"
-                >
-                  <input 
-                    type="color" 
-                    v-model="parentConfig.borderColor"
-                    :disabled="parentConfig.borderColor === 'none'"
-                    :class="{ 'transparent': parentConfig.borderColor === 'none' }"
-                  >
-                </div>
-                <input 
-                  type="text" 
-                  v-model="parentConfig.borderColor"
-                  :disabled="parentConfig.borderColor === 'none'"
-                  :class="{ 'transparent': parentConfig.borderColor === 'none' }"
-                  class="color-text"
-                >
-              </div>
-              <button 
-                class="secondary-button"
-                @click="toggleBorderColor"
-              >
-                {{ parentConfig.borderColor === 'none' ? 'Set Color' : 'None' }}
-              </button>
-              <input 
-                type="number" 
-                v-model.number="parentConfig.borderWidth"
-                min="0"
-                :disabled="parentConfig.borderColor === 'none'"
-                class="border-width"
-              >
-              <span class="unit-label">px</span>
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Border Radius (px)</label>
-            <div class="radius-control">
-              <input 
-                type="range" 
-                v-model.number="parentConfig.borderRadius"
-                min="0"
-                max="32"
-                class="radius-slider"
-              >
-              <input 
-                type="number" 
-                v-model.number="parentConfig.borderRadius"
-                min="0"
-                max="32"
-                class="radius-number"
-              >
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Background Color</label>
+        <div class="form-group">
+          <label>Border</label>
+          <div class="border-controls">
             <div class="color-with-text">
               <div 
                 class="color-swatch"
-                :class="{ 'checker-pattern': parentConfig.backgroundColor === 'transparent' }"
+                :class="{ 'checker-pattern': parentConfig.borderColor === 'none' }"
               >
                 <input 
                   type="color" 
-                  v-model="parentConfig.backgroundColor"
-                  :disabled="parentConfig.backgroundColor === 'transparent'"
-                  :class="{ 'transparent': parentConfig.backgroundColor === 'transparent' }"
+                  v-model="parentConfig.borderColor"
+                  :disabled="parentConfig.borderColor === 'none'"
+                  :class="{ 'transparent': parentConfig.borderColor === 'none' }"
                 >
               </div>
               <input 
                 type="text" 
+                v-model="parentConfig.borderColor"
+                :disabled="parentConfig.borderColor === 'none'"
+                :class="{ 'transparent': parentConfig.borderColor === 'none' }"
+                class="color-text"
+              >
+            </div>
+            <button 
+              class="secondary-button"
+              @click="toggleBorderColor"
+            >
+              {{ parentConfig.borderColor === 'none' ? 'Set Color' : 'None' }}
+            </button>
+            <input 
+              type="number" 
+              v-model.number="parentConfig.borderWidth"
+              min="0"
+              :disabled="parentConfig.borderColor === 'none'"
+              class="border-width"
+            >
+            <span class="unit-label">px</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Border Radius (px)</label>
+          <div class="radius-control">
+            <input 
+              type="range" 
+              v-model.number="parentConfig.borderRadius"
+              min="0"
+              max="32"
+              class="radius-slider"
+            >
+            <input 
+              type="number" 
+              v-model.number="parentConfig.borderRadius"
+              min="0"
+              max="32"
+              class="radius-number"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Background Color</label>
+          <div class="color-with-text">
+            <div 
+              class="color-swatch"
+              :class="{ 'checker-pattern': parentConfig.backgroundColor === 'transparent' }"
+            >
+              <input 
+                type="color" 
                 v-model="parentConfig.backgroundColor"
                 :disabled="parentConfig.backgroundColor === 'transparent'"
                 :class="{ 'transparent': parentConfig.backgroundColor === 'transparent' }"
-                class="color-text"
               >
-              <button 
-                class="secondary-button"
-                @click="toggleBackgroundColor"
-              >
-                {{ parentConfig.backgroundColor === 'transparent' ? 'Set Color' : 'Transparent' }}
-              </button>
             </div>
+            <input 
+              type="text" 
+              v-model="parentConfig.backgroundColor"
+              :disabled="parentConfig.backgroundColor === 'transparent'"
+              :class="{ 'transparent': parentConfig.backgroundColor === 'transparent' }"
+              class="color-text"
+            >
+            <button 
+              class="secondary-button"
+              @click="toggleBackgroundColor"
+            >
+              {{ parentConfig.backgroundColor === 'transparent' ? 'Set Color' : 'Transparent' }}
+            </button>
           </div>
         </div>
       </div>
@@ -598,7 +596,7 @@ export default {
   max-height: 100%;
 
   h2 {
-    margin: 0;
+    margin: 0 2rem 0 0;
     font-size: 1.55rem;
     font-weight: 600;
   }
@@ -615,11 +613,49 @@ export default {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 1.5rem;
+  
+  .mode-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .mode-option {
+    position: relative;
+    flex: 1;
+  }
+
+  .mode-option input[type="radio"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+  }
+
+  .settings-mode-selector {
+    display: flex;
+    gap: 0.5rem;
+    flex: 1;
+    width: 200px;
+  }
+
+  .mode-option input[type="radio"]:checked + .mode-label {
+    background: #ECFDF5;
+    border-color: #059669;
+    color: #059669;
+  }
+
+  .mode-option:hover .mode-label {
+    border-color: #D1D5DB;
+  }
+
+  .mode-option input[type="radio"]:focus + .mode-label {
+    outline: 2px solid #059669;
+    outline-offset: 2px;
+  }
 }
 
-.settings-header h2 {
-  margin: 0;
-}
 
 .easy-mode {
   display: grid;
@@ -648,10 +684,12 @@ export default {
 .mode-selector {
   display: flex;
   gap: 0.5rem;
+  flex: 1;
 }
 
 .mode-option {
   position: relative;
+  flex: 1;
 }
 
 .mode-option input[type="radio"] {
@@ -674,6 +712,7 @@ export default {
   font-weight: 500;
   color: #374151;
   transition: all 0.2s;
+  width: 100%;
 }
 
 .mode-option input[type="radio"]:checked + .mode-label {
