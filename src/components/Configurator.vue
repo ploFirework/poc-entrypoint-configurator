@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div v-if="!isAdvancedMode" class="easy-mode" style="grid-column: 1 / -1; padding: 0 20rem;">
+      <div v-if="!isAdvancedMode" class="easy-mode" style="grid-column: 1 / -1;">
         <button 
           class="preset-button"
           @click="applyPreset('simpleButton')"
@@ -673,6 +673,8 @@ export default {
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
+  width: 30%;
+  margin: 0 auto;
 }
 
 .preset-button:hover {
