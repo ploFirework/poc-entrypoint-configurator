@@ -72,7 +72,7 @@
         </div>
       </div>
 
-      <div v-if="!isAdvancedMode" class="easy-mode">
+      <div v-if="!isAdvancedMode" class="easy-mode" style="grid-column: 1 / -1; padding: 0 20rem;">
         <button 
           class="preset-button"
           @click="applyPreset('simpleButton')"
