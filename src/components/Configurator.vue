@@ -4,7 +4,7 @@
       <div 
         class="preview-container"
         :class="{ 
-          'preview-container--responsive': parentConfig.isResponsive,
+          'preview-container--responsive': !parentConfig.isFixedSize,
           'preview-container--drawer': parentConfig.mode === 'drawer'
         }"
         :style="{
@@ -13,14 +13,23 @@
           borderWidth: parentConfig.borderColor === 'none' ? 0 : `${parentConfig.borderWidth}px`,
           borderRadius: `${parentConfig.borderRadius}px`,
           borderStyle: parentConfig.borderColor === 'none' ? 'none' : 'solid',
-          width: !parentConfig.isResponsive ? `${parentConfig.width}px` : undefined,
-          height: !parentConfig.isResponsive ? `${parentConfig.height}px` : undefined
+          width: parentConfig.isFixedSize ? `${parentConfig.width}px` : undefined,
+          height: parentConfig.isFixedSize ? `${parentConfig.height}px` : undefined
         }"
       >
+        <div v-if="parentConfig.mode === 'drawer'" class="drawer-tab" :style="{ backgroundColor: parentConfig.backgroundColor === 'transparent' ? 'transparent' : parentConfig.backgroundColor }">
+          <svg class="drawer-tab-icon" width="16" height="16" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+            :fill="parentConfig.primaryColor"
+            d="M4.52 1.804a1 1 0 0 1 1.96 0l.24 1.192a1 1 0 0 0 .783.785l1.192.238a1 1 0 0 1 0 1.962l-1.192.238a1 1 0 0 0-.785.785L6.48 8.196a1 1 0 0 1-1.962 0L4.28 7.004a1 1 0 0 0-.785-.785L2.303 5.98a1 1 0 0 1 0-1.962l1.192-.238a1 1 0 0 0 .785-.785l.238-1.192h.001Zm9.03 3.88a1 1 0 0 1 1.898 0l.683 2.05a1 1 0 0 0 .633.634l2.051.683a1 1 0 0 1 0 1.898l-2.05.684a1 1 0 0 0-.634.632l-.683 2.05a1 1 0 0 1-1.898 0l-.683-2.05a1.002 1.002 0 0 0-.633-.633l-2.05-.683a1 1 0 0 1 0-1.898l2.05-.683a1 1 0 0 0 .633-.633l.683-2.051Zm-7 8a1 1 0 0 1 1.898 0l.184.55a.999.999 0 0 0 .632.634l.551.183a1 1 0 0 1 0 1.898l-.55.183a1.001 1.001 0 0 0-.634.633l-.183.55a1 1 0 0 1-1.898 0l-.184-.55a1 1 0 0 0-.632-.633l-.55-.183a1 1 0 0 1 0-1.898l.55-.184a1 1 0 0 0 .633-.632l.183-.551Z"
+            />
+          </svg>
+          <span class="drawer-tab-text">Ask</span>
+        </div>
         <div class="header-container" style="display: flex; align-items: center; gap: 1rem;">
           <template v-if="parentConfig.showThumbnail">
             <div class="thumbnail">
-              <img src="@/assets/avatar.svg" alt="Thumbnail" />
+              <img src="@/assets/thumbnail.gif" alt="Thumbnail" />
             </div>
           </template>
           <h3 v-if="parentConfig.title" class="title">{{ parentConfig.title }}</h3>
@@ -33,6 +42,7 @@
               v-bind="getModuleProps(module)"
               :primary-color="parentConfig.primaryColor"
               :border-radius="parentConfig.borderRadius"
+              :text-color="buttonTextColor"
             />
           </template>
         </div>
@@ -40,23 +50,25 @@
     </div>
 
     <div class="configurator__settings">
-      <div class="settings-section" style="grid-row: 1 / -1;">
-        <h2>Parent Container Settings</h2>
-        <div class="settings-group">
-          <label class="checkbox-label">
-            <input 
-              type="checkbox" 
-              v-model="parentConfig.isResponsive"
-            > Responsive Container
-          </label>
+      <h2 style="grid-column: 1 / -1;">Ava Entry Point</h2>
 
-          <template v-if="!parentConfig.isResponsive">
+      <div class="settings-section" style="grid-row: 2 / -1;">
+        <div class="settings-group">
+          <div class="container-size-controls">
+            <label class="checkbox-label" style="margin-top:20px;">
+              <input 
+                type="checkbox" 
+                v-model="parentConfig.isFixedSize"
+              > Set Fixed Size
+            </label>
+
             <div class="form-group">
               <label>Width (px)</label>
               <input 
                 type="number" 
                 v-model.number="parentConfig.width"
                 min="0"
+                :disabled="!parentConfig.isFixedSize"
               >
             </div>
             <div class="form-group">
@@ -65,9 +77,32 @@
                 type="number" 
                 v-model.number="parentConfig.height"
                 min="0"
+                :disabled="!parentConfig.isFixedSize"
               >
             </div>
-          </template>
+          </div>
+
+          <div class="form-group">
+            <label>Mode</label>
+            <div class="mode-selector">
+              <label class="mode-option">
+                <input 
+                  type="radio" 
+                  v-model="parentConfig.mode" 
+                  value="block"
+                >
+                <span class="mode-label">Block</span>
+              </label>
+              <label class="mode-option">
+                <input 
+                  type="radio" 
+                  v-model="parentConfig.mode" 
+                  value="drawer"
+                >
+                <span class="mode-label">Drawer</span>
+              </label>
+            </div>
+          </div>
           
           <label class="checkbox-label">
             <input 
@@ -140,7 +175,22 @@
 
           <div class="form-group">
             <label>Border Radius (px)</label>
-            <input type="number" v-model.number="parentConfig.borderRadius" min="0">
+            <div class="radius-control">
+              <input 
+                type="range" 
+                v-model.number="parentConfig.borderRadius"
+                min="0"
+                max="32"
+                class="radius-slider"
+              >
+              <input 
+                type="number" 
+                v-model.number="parentConfig.borderRadius"
+                min="0"
+                max="32"
+                class="radius-number"
+              >
+            </div>
           </div>
 
           <div class="form-group">
@@ -171,14 +221,6 @@
                 {{ parentConfig.backgroundColor === 'transparent' ? 'Set Color' : 'Transparent' }}
               </button>
             </div>
-          </div>
-
-          <div class="form-group">
-            <label>Mode</label>
-            <select v-model="parentConfig.mode">
-              <option value="block">Block</option>
-              <option value="drawer">Drawer</option>
-            </select>
           </div>
         </div>
       </div>
@@ -285,6 +327,23 @@ import ButtonListConfig from './ButtonListConfig.vue'
 import TextField from './TextField.vue'
 import TextFieldConfig from './TextFieldConfig.vue'
 
+const calculateBrightness = (hexColor) => {
+  // Remove # if present
+  const hex = hexColor.replace('#', '')
+  
+  // Convert hex to RGB
+  const r = parseInt(hex.substring(0, 2), 16)
+  const g = parseInt(hex.substring(2, 4), 16)
+  const b = parseInt(hex.substring(4, 6), 16)
+  
+  // Calculate brightness using perceived brightness formula
+  // (R * 299 + G * 587 + B * 114) / 1000
+  const brightness = Math.round((r * 299 + g * 587 + b * 114) / 1000)
+  
+  // Ensure the result is between 0 and 255
+  return Math.min(255, Math.max(0, brightness))
+}
+
 export default {
   name: 'EntrypointConfigurator',
   
@@ -299,12 +358,13 @@ export default {
 
   setup() {
     const parentConfig = reactive({
-      isResponsive: true,
+      isFixedSize: false,
       width: 400,
       height: 400,
       showThumbnail: true,
       title: 'Have questions about this product?',
       primaryColor: '#006AFF',
+      
       borderColor: '#E5E7EB',
       borderWidth: 1,
       borderRadius: 12,
@@ -327,9 +387,8 @@ export default {
         type: 'ButtonList',
         enabled: true,
         config: {
-          buttons: ['Lorem ipsum dolor sit amet', 'Consectetur adipiscing elit', 'Sed do eiusmod tempor'],
+          buttons: ['Lorem ipsum dolor sit amet', 'Consectetur adipiscing elit'],
           layout: 'horizontal',
-          showAiIcon: false,
           showAskAnother: true
         }
       },
@@ -350,6 +409,8 @@ export default {
         .map(index => modules.value[index])
         .filter(m => m.enabled)
     )
+
+    const isResponsive = computed(() => !parentConfig.isFixedSize)
 
     const getModuleLabel = (type) => {
       const labels = {
@@ -389,6 +450,12 @@ export default {
         : 'transparent'
     }
 
+    // Add computed property for text color
+    const buttonTextColor = computed(() => {
+      const brightness = calculateBrightness(parentConfig.primaryColor)
+      return brightness > 127 ? '#000000' : '#FFFFFF'
+    })
+
     return {
       parentConfig,
       modules,
@@ -398,7 +465,9 @@ export default {
       moveModule,
       toggleBorderColor,
       toggleBackgroundColor,
-      displayOrder
+      displayOrder,
+      isResponsive,
+      buttonTextColor
     }
   }
 }
@@ -407,7 +476,7 @@ export default {
 <style scoped>
 .configurator {
   display: grid;
-  grid-template-rows: 1fr 1fr;
+  grid-template-rows: auto 1fr;
   gap: 2rem;
   padding: 2rem;
   height: 100vh;
@@ -423,29 +492,37 @@ export default {
   display: flex;
   justify-content: center;
   align-items: flex-start;
+  position: relative;
+  overflow: hidden;
 }
 
 .configurator__settings {
   display: grid;
-  grid-template: auto auto auto / 2fr 2fr;
+  grid-template: auto auto auto auto / 1fr 1fr;
   gap: 1rem;
   height: 100%;
-}
 
-.settings-section {
   background: white;
   border-radius: 8px;
   padding: 1.5rem;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   max-height: 100%;
+
+  h2 {
+    margin: 0;
+    font-size: 1.55rem;
+    font-weight: 600;
+  }
 }
 
-.settings-section h2 {
-  margin: 0 0 1rem;
-  font-size: 1.25rem;
-  font-weight: 600;
-}
+.settings-section {
+  padding: 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+} 
+
+
 
 .settings-group {
   display: flex;
@@ -531,6 +608,7 @@ input[type="color"] {
   background: #fff;
   border: 1px solid #E5E7EB;
   border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
 }
 
 .preview-container--responsive {
@@ -538,11 +616,19 @@ input[type="color"] {
 }
 
 .preview-container--drawer {
-  position: relative;
-  margin-left: auto;
+  overflow: visible;
+  position: absolute;
+  right: 0;
+  top: 0;
   height: 100%;
+  margin: 0;
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  transform: translateX(calc(100% - 8px));
+}
+
+.preview-container--drawer:hover {
+  transform: translateX(0);
 }
 
 .header-container {
@@ -738,5 +824,171 @@ input[type="color"] {
   opacity: 0.5;
   filter: grayscale(100%);
   pointer-events: none;
+}
+
+.drawer-tab {
+  position: absolute;
+  left: -40px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 40px;
+  height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 8px 0 0 8px;
+  cursor: pointer;
+}
+
+.drawer-tab-text {
+  writing-mode: vertical-lr;
+  transform: rotate(180deg);
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.drawer-tab-icon {
+  transform: rotate(90deg);
+}
+
+.container-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.container-size-controls .form-group {
+  flex: 1;
+  margin: 0;
+}
+
+.container-size-controls input[type="number"] {
+  width: 100%;
+}
+
+.container-size-controls input[type="number"]:disabled {
+  background-color: #F3F4F6;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.container-size-controls .checkbox-label {
+  min-width: 160px;
+}
+
+.radius-control {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.radius-slider {
+  flex: 1;
+  height: 2px;
+  background: #E5E7EB;
+  border-radius: 2px;
+  appearance: none;
+  outline: none;
+}
+
+.radius-slider::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #006AFF;
+  cursor: pointer;
+  border: none;
+  margin-top: -6px;
+}
+
+.radius-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #006AFF;
+  cursor: pointer;
+  border: none;
+}
+
+.radius-slider::-webkit-slider-runnable-track {
+  height: 2px;
+  background: #E5E7EB;
+  border-radius: 2px;
+  border: none;
+}
+
+.radius-slider::-moz-range-track {
+  height: 2px;
+  background: #E5E7EB;
+  border-radius: 2px;
+  border: none;
+}
+
+.radius-number {
+  width: 60px;
+  text-align: center;
+  padding: 0.5rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 0.875rem;
+}
+
+.radius-number::-webkit-inner-spin-button {
+  opacity: 1;
+  height: 24px;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+.mode-option {
+  flex: 1;
+  position: relative;
+  cursor: pointer;
+}
+
+.mode-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.mode-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s;
+}
+
+.mode-option input[type="radio"]:checked + .mode-label {
+  background: #EBF5FF;
+  border-color: #006AFF;
+  color: #006AFF;
+}
+
+.mode-option:hover .mode-label {
+  border-color: #D1D5DB;
+}
+
+.mode-option input[type="radio"]:focus + .mode-label {
+  outline: 2px solid #006AFF;
+  outline-offset: 2px;
 }
 </style>

@@ -3,7 +3,8 @@
     class="simple-button"
     :style="{
       borderRadius: `${borderRadius}px`,
-      backgroundColor: primaryColor
+      backgroundColor: primaryColor,
+      color: textColor
     }"
   >
     <span class="button-text">{{ text }}</span>
@@ -25,7 +26,7 @@ export default {
   props: {
     text: {
       type: String,
-      default: 'Click me'
+      required: true
     },
     showAiIcon: {
       type: Boolean,
@@ -33,11 +34,15 @@ export default {
     },
     primaryColor: {
       type: String,
-      default: '#007AFF'
+      required: true
     },
     borderRadius: {
       type: Number,
-      default: 8
+      required: true
+    },
+    textColor: {
+      type: String,
+      required: true
     }
   }
 }
@@ -63,14 +68,14 @@ export default {
 }
 
 .button-text {
-  order: 2;
+  order: 1;
 }
 
 .ai-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  order: 1;
+  order: 2;
 }
 
 .ai-icon svg {

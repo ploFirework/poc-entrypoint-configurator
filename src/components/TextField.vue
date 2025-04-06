@@ -16,7 +16,8 @@
       @click="handleSubmit"
       :style="{
         backgroundColor: primaryColor,
-        borderRadius: `${borderRadius}px`
+        borderRadius: `${borderRadius - 4}px`,
+        color: textColor
       }"
     >
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,15 +37,19 @@ export default {
   props: {
     placeholder: {
       type: String,
-      default: 'Ask a question'
+      required: true
     },
     primaryColor: {
       type: String,
-      default: '#007AFF'
+      required: true
     },
     borderRadius: {
       type: Number,
-      default: 8
+      required: true
+    },
+    textColor: {
+      type: String,
+      required: true
     }
   },
 
