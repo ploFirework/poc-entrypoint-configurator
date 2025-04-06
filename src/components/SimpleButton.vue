@@ -2,9 +2,12 @@
   <button 
     class="simple-button"
     :style="{
+      border: `1px solid #aaa`,
       borderRadius: `${borderRadius}px`,
-      backgroundColor: primaryColor,
-      color: textColor
+      // backgroundColor: primaryColor,
+      // color: textColor
+      backgroundColor: '#fff',
+      color: '#000'
     }"
   >
     <span class="button-text">{{ text }}</span>

@@ -50,10 +50,51 @@
     </div>
 
     <div class="configurator__settings">
-      <h2 style="grid-column: 1 / -1;">Ava Entry Point</h2>
+      <div class="settings-section" style="grid-row: 1 / -1;">
+        <div class="settings-header">
+          <h2>Ava Entry Point</h2>
+          <div class="mode-selector">
+            <label class="mode-option">
+              <input 
+                type="radio" 
+                v-model="isAdvancedMode" 
+                :value="false"
+              >
+              <span class="mode-label">Easy</span>
+            </label>
+            <label class="mode-option">
+              <input 
+                type="radio" 
+                v-model="isAdvancedMode" 
+                :value="true"
+              >
+              <span class="mode-label">Advanced</span>
+            </label>
+          </div>
+        </div>
 
-      <div class="settings-section" style="grid-row: 2 / -1;">
-        <div class="settings-group">
+        <div v-if="!isAdvancedMode" class="easy-mode">
+          <button 
+            class="preset-button"
+            @click="applyPreset('simpleButton')"
+          >
+            Simple Button
+          </button>
+          <button 
+            class="preset-button"
+            @click="applyPreset('faq')"
+          >
+            FAQ
+          </button>
+          <button 
+            class="preset-button"
+            @click="applyPreset('drawer')"
+          >
+            Drawer
+          </button>
+        </div>
+
+        <div v-show="isAdvancedMode" class="settings-group">
           <div class="container-size-controls">
             <label class="checkbox-label" style="margin-top:20px;">
               <input 
@@ -225,7 +266,7 @@
         </div>
       </div>
 
-      <div class="settings-section">
+      <div v-show="isAdvancedMode" class="settings-section">
         <div class="module-header">
           <label class="toggle-label">
             <input 
@@ -255,7 +296,7 @@
         </div>
       </div>
 
-      <div class="settings-section">
+      <div v-show="isAdvancedMode" class="settings-section">
         <div class="module-header">
           <label class="toggle-label">
             <input 
@@ -285,7 +326,7 @@
         </div>
       </div>
 
-      <div class="settings-section">
+      <div v-show="isAdvancedMode" class="settings-section">
         <div class="module-header">
           <label class="toggle-label">
             <input 
@@ -344,6 +385,37 @@ const calculateBrightness = (hexColor) => {
   return Math.min(255, Math.max(0, brightness))
 }
 
+const PRESETS = {
+  simpleButton: {
+    mode: 'block',
+    isFixedSize: true,
+    width: 400,
+    height: 170,
+    showThumbnail: true,
+    title: 'Have questions about this product?',
+    borderRadius: 12,
+    modules: [true, false, false] // Simple Button, Question List, Question Field
+  },
+  faq: {
+    mode: 'block',
+    isFixedSize: false,
+    showThumbnail: false,
+    title: '',
+    borderRadius: 12,
+    modules: [false, true, true]
+  },
+  drawer: {
+    mode: 'drawer',
+    isFixedSize: true,
+    width: 200,
+    height: 122,
+    showThumbnail: false,
+    title: 'Lorem ipsum dolor sit amet?',
+    borderRadius: 0,
+    modules: [false, false, false]
+  }
+}
+
 export default {
   name: 'EntrypointConfigurator',
   
@@ -357,14 +429,15 @@ export default {
   },
 
   setup() {
+    const isAdvancedMode = ref(false)
+
     const parentConfig = reactive({
-      isFixedSize: false,
+      isFixedSize: true,
       width: 400,
-      height: 400,
+      height: 170,
       showThumbnail: true,
       title: 'Have questions about this product?',
       primaryColor: '#006AFF',
-      
       borderColor: '#E5E7EB',
       borderWidth: 1,
       borderRadius: 12,
@@ -385,7 +458,7 @@ export default {
       {
         id: 2,
         type: 'ButtonList',
-        enabled: true,
+        enabled: false,
         config: {
           buttons: ['Lorem ipsum dolor sit amet', 'Consectetur adipiscing elit'],
           layout: 'horizontal',
@@ -395,7 +468,7 @@ export default {
       {
         id: 3,
         type: 'TextField',
-        enabled: true,
+        enabled: false,
         config: {
           placeholder: 'Ask a question'
         }
@@ -456,6 +529,19 @@ export default {
       return brightness > 127 ? '#000000' : '#FFFFFF'
     })
 
+    const applyPreset = (preset) => {
+      parentConfig.mode = PRESETS[preset].mode
+      parentConfig.showThumbnail = PRESETS[preset].showThumbnail
+      parentConfig.title = PRESETS[preset].title
+      parentConfig.isFixedSize = PRESETS[preset].isFixedSize
+      parentConfig.width = PRESETS[preset].width
+      parentConfig.height = PRESETS[preset].height
+      parentConfig.borderRadius = PRESETS[preset].borderRadius  
+      PRESETS[preset].modules.forEach((enabled, index) => {
+        modules.value[index].enabled = enabled
+      })
+    }
+
     return {
       parentConfig,
       modules,
@@ -467,7 +553,9 @@ export default {
       toggleBackgroundColor,
       displayOrder,
       isResponsive,
-      buttonTextColor
+      buttonTextColor,
+      isAdvancedMode,
+      applyPreset
     }
   }
 }
@@ -476,7 +564,7 @@ export default {
 <style scoped>
 .configurator {
   display: grid;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: min(auto, 300px) 1fr;
   gap: 2rem;
   padding: 2rem;
   height: 100vh;
@@ -522,7 +610,86 @@ export default {
   border-radius: 8px;
 } 
 
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
 
+.settings-header h2 {
+  margin: 0;
+}
+
+.easy-mode {
+  display: grid;
+  gap: 1rem;
+  padding: 2rem 0;
+}
+
+.preset-button {
+  padding: 2rem;
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: #374151;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preset-button:hover {
+  background: #EBF5FF;
+  border-color: #006AFF;
+  color: #006AFF;
+}
+
+.mode-selector {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.mode-option {
+  position: relative;
+}
+
+.mode-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.mode-label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.75rem;
+  background: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  transition: all 0.2s;
+}
+
+.mode-option input[type="radio"]:checked + .mode-label {
+  background: #EBF5FF;
+  border-color: #006AFF;
+  color: #006AFF;
+}
+
+.mode-option:hover .mode-label {
+  border-color: #D1D5DB;
+}
+
+.mode-option input[type="radio"]:focus + .mode-label {
+  outline: 2px solid #006AFF;
+  outline-offset: 2px;
+}
 
 .settings-group {
   display: flex;
@@ -602,8 +769,6 @@ input[type="color"] {
 .preview-container {
   max-height: 100%;
   overflow-y: auto;
-  min-width: 300px;
-  min-height: 200px;
   padding: 1.5rem;
   background: #fff;
   border: 1px solid #E5E7EB;
@@ -941,54 +1106,5 @@ input[type="color"] {
 .radius-number::-webkit-inner-spin-button {
   opacity: 1;
   height: 24px;
-}
-
-.mode-selector {
-  display: flex;
-  gap: 1rem;
-  margin-top: 0.5rem;
-}
-
-.mode-option {
-  flex: 1;
-  position: relative;
-  cursor: pointer;
-}
-
-.mode-option input[type="radio"] {
-  position: absolute;
-  opacity: 0;
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-}
-
-.mode-label {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem;
-  background: #F3F4F6;
-  border: 1px solid #E5E7EB;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: #374151;
-  transition: all 0.2s;
-}
-
-.mode-option input[type="radio"]:checked + .mode-label {
-  background: #EBF5FF;
-  border-color: #006AFF;
-  color: #006AFF;
-}
-
-.mode-option:hover .mode-label {
-  border-color: #D1D5DB;
-}
-
-.mode-option input[type="radio"]:focus + .mode-label {
-  outline: 2px solid #006AFF;
-  outline-offset: 2px;
 }
 </style>
